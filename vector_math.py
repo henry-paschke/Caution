@@ -19,3 +19,8 @@ def normalize_radian_angle(angle):
     
     return angle
         
+def lerp(start, target, elapsed, total_time):
+    fraction_time = elapsed / total_time
+    total_distance = target - start
+    return fraction_time * total_distance
+
