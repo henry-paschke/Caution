@@ -11,16 +11,17 @@ g_screen_surface = pg.display.set_mode(SCREEN_SIZE)
 g_clock = pg.time.Clock()
 g_game_objects = []
 
-go = game_object.Game_object((500, 250), math.pi  / 6, 100, 3)
-go.add_child(game_object.Game_object([0,0], -math.pi / 6, 100, 3))
+go = game_object.Game_object((500, 250), math.pi  / 6, 100, "parent")
+go.add_child(game_object.Game_object([120,0], -math.pi / 6, 100, "child"))
 
+print(go.get_visualization())
 
 while g_running:
     g_screen_surface.fill(BLACK)
     g_clock.tick()
 
-    for i in range(1000):
-        go.update(g_screen_surface)
+    go.local_rotation += g_clock.get_time() / 1000
+    go.update(g_screen_surface)
 
     for e in pg.event.get():
         if e.type == pg.QUIT:
