@@ -22,5 +22,20 @@ def normalize_radian_angle(angle):
 def lerp(start, target, elapsed, total_time):
     fraction_time = elapsed / total_time
     total_distance = target - start
-    return fraction_time * total_distance
+    if (target == 250):
+        print(start, target, elapsed, total_time)
+        print(fraction_time * total_distance)
+    return start + (fraction_time * total_distance)
 
+def angular_lerp(start, target, elapsed, total_time):
+    fraction_time = elapsed / total_time
+    total_distance = target - start
+
+    if total_distance > math.pi:
+        total_distance -= 2 * math.pi
+    elif total_distance < -math.pi:
+        total_distance += 2 * math.pi
+    
+    interpolated_angle = start + total_distance * fraction_time
+    return interpolated_angle
+        

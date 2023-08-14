@@ -4,13 +4,21 @@ import vector_math
 
 class Target:
     def __init__(self, position : list[float, float], rotation : float, time = -1):
-        self.position = position.copy()
+        self.position = list(position).copy()
         self.rotation = rotation
         self.time = time
     def Xpos(self):
         return self.position[0]
     def Ypos(self):
         return self.position[1]
+    
+def create_keyframe_from_serialized(data, time):
+    target = Target(data[0], data[1], time)
+    output = [target, []]
+    print()
+    for i in range(len(data[2])):
+        output[1].append(create_keyframe_from_serialized(data[2][i], time))
+    return output
 
 
 class Game_object:
@@ -59,7 +67,7 @@ class Game_object:
                 self.elapsed += delta_time
                 self.local_position[0] = vector_math.lerp(self.target_startpos.Xpos(), self.target.Xpos(), self.elapsed, self.target.time)
                 self.local_position[1] = vector_math.lerp(self.target_startpos.Ypos(), self.target.Ypos(), self.elapsed, self.target.time)
-                self.local_rotation = vector_math.lerp(self.target_startpos.rotation, self.target.rotation, self.elapsed, self.target.time)
+                self.local_rotation = vector_math.angular_lerp(self.target_startpos.rotation, self.target.rotation, self.elapsed, self.target.time)
             else:
                 self.local_position[0] = self.target.Xpos()
                 self.local_position[1] = self.target.Ypos()
@@ -81,9 +89,22 @@ class Game_object:
             visual += ")"
         return visual
     
-    def serialize_data(self):
+    def get_current_as_target(self):
         self.normalize_rotation()
         return Target(self.local_position, self.local_rotation)
+    
+    def serialize_data(self):
+        self.normalize_rotation()
+        data = [self.local_position, self.local_rotation, []]
+        for child in self.children:
+            data[2].append(child.serialize_data())
+        return data
+    
+    def read_serialized_data(self, data):
+        self.local_position = data[0]
+        self.local_rotation = data[1]
+        for i in range(len(data[2])):
+            self.children[i].read_serialized_data(data[2][i])
 
     def seek_first_child(self, name_string):
         for child in self.children:
@@ -99,4 +120,10 @@ class Game_object:
     def set_target(self, target):
         self.elapsed = 0
         self.target = target
-        self.target_startpos = self.serialize_data()
+        self.target_startpos = self.get_current_as_target()
+
+    def set_keyframe(self, keyframe):
+        self.set_target(keyframe[0])
+        for i in range(len(keyframe[1])):
+            self.children[i].set_keyframe(keyframe[1][i])
+
