@@ -44,24 +44,26 @@ class Game_object:
     def set_parent(self, parent):
         self.parent = parent
 
-    def chain_update(self, surface, delta_time):
-        self.update_target(delta_time)
+    def chain_update(self, surface, delta_time, target_update):
+        if (target_update):
+            self.update_target(delta_time)
         self.global_rotation = self.parent.global_rotation + self.local_rotation
-        self.global_position = vector_math.get_endpos(self.parent.global_position, self.parent.global_rotation, self.local_position[0], self.local_position[1])
+        self.global_position = vector_math.get_endpos(self.parent.global_position, self.parent.global_rotation, -self.local_position[0], -self.local_position[1])
         self.normalize_rotation()
         self.draw(surface)
         for child in self.children:
-            child.chain_update(surface, delta_time)
+            child.chain_update(surface, delta_time, target_update)
 
     #TODO remove duplicate code 
-    def update(self, surface, delta_time):
-        self.update_target(delta_time)
+    def update(self, surface, delta_time, target_update):
+        if (target_update):
+            self.update_target(delta_time)
         self.global_position = vector_math.add_vector2([0,0], self.local_position)
         self.global_rotation = self.local_rotation
         self.normalize_rotation()
         self.draw(surface)
         for child in self.children:
-            child.chain_update(surface, delta_time)
+            child.chain_update(surface, delta_time, target_update)
 
     def update_target(self, delta_time):
         if (self.target):
@@ -86,8 +88,8 @@ class Game_object:
             visual += "("
             for i in range(len(self.children)):
                 visual += (self.children[i].get_visualization())
-                if (i != len(self.children)):
-                    visual + ", "
+                if (i != len(self.children) - 1):
+                    visual += ", "
             visual += ")"
         return visual
     
@@ -131,7 +133,6 @@ class Game_object:
         return False
     
 
-    
     #targets are in this format: [time, [localposX, localposY], rotation]
     def set_target(self, target):
         self.elapsed = 0
@@ -144,7 +145,7 @@ class Game_object:
             self.children[i].set_keyframe(keyframe[1][i])
 
     def draw_recursive(self, surface):
-        self.draw()
+        self.draw(surface)
         for child in self.children:
             child.draw_recursive(surface)
     
