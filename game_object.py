@@ -1,6 +1,7 @@
 import pygame as pg
 import math
 import vector_math
+from globals import *
 
 class Target:
     def __init__(self, position : list[float, float], rotation : float, time = -1):
@@ -15,10 +16,10 @@ class Target:
 def create_keyframe_from_serialized(data, time):
     target = Target(data[0], data[1], time)
     output = [target, []]
-    print()
     for i in range(len(data[2])):
         output[1].append(create_keyframe_from_serialized(data[2][i], time))
     return output
+
 
 
 class Game_object:
@@ -34,6 +35,7 @@ class Game_object:
         self.target = None
         self.elapsed = 0
         self.target_startpos = None
+        self.selected = False
 
     def add_child(self, game_object):
         self.children.append(game_object)
@@ -47,7 +49,7 @@ class Game_object:
         self.global_rotation = self.parent.global_rotation + self.local_rotation
         self.global_position = vector_math.get_endpos(self.parent.global_position, self.parent.global_rotation, self.local_position[0], self.local_position[1])
         self.normalize_rotation()
-        pg.draw.line(surface, (255,255,255), self.global_position, vector_math.get_endpos(self.global_position, self.global_rotation, self.length, 0))
+        self.draw(surface)
         for child in self.children:
             child.chain_update(surface, delta_time)
 
@@ -57,7 +59,7 @@ class Game_object:
         self.global_position = vector_math.add_vector2([0,0], self.local_position)
         self.global_rotation = self.local_rotation
         self.normalize_rotation()
-        pg.draw.line(surface, (255,255,255), self.global_position, vector_math.get_endpos(self.global_position, self.global_rotation, self.length, 0))
+        self.draw(surface)
         for child in self.children:
             child.chain_update(surface, delta_time)
 
@@ -116,6 +118,20 @@ class Game_object:
                     return child_result
         return False
     
+    def seek_selected(self):
+        if self.selected:
+            return self
+        for child in self.children:
+            if child.selected:
+                return child
+            else:
+                child_result = child.seek_selected()
+                if child_result:
+                    return child_result
+        return False
+    
+
+    
     #targets are in this format: [time, [localposX, localposY], rotation]
     def set_target(self, target):
         self.elapsed = 0
@@ -126,4 +142,47 @@ class Game_object:
         self.set_target(keyframe[0])
         for i in range(len(keyframe[1])):
             self.children[i].set_keyframe(keyframe[1][i])
+
+    def draw_recursive(self, surface):
+        self.draw()
+        for child in self.children:
+            child.draw_recursive(surface)
+    
+    def draw(self, surface):
+        if self.selected:
+            pg.draw.line(surface, (255,0,0), self.global_position, vector_math.get_endpos(self.global_position, self.global_rotation, self.length, 0), 5)
+        else :
+            pg.draw.line(surface, (255,255,255), self.global_position, vector_math.get_endpos(self.global_position, self.global_rotation, self.length, 0))
+    
+    def select_parent(self):
+        if self.parent:
+            self.parent.selected = True
+            self.selected = False
+            return self.parent
+        console_log("No parent of selected object " + self.name)
+        return self
+
+    def select_first_child(self):
+        if len(self.children):
+            self.selected = False
+            self.children[0].selected = True
+            return self.children[0]
+        else:
+            console_log("No children of selected object " + self.name)
+            return self
+        
+
+    def select_sibling(self):
+        if self.parent:
+            index = self.parent.children.index(self)
+            index += 1
+            if index >= len(self.parent.children):
+                index = 0
+            self.selected = False
+            self.parent.children[index].selected = True
+            return self.parent.children[index]
+        console_log("No sibling of selected object " + self.name)
+        return self
+            
+
 
