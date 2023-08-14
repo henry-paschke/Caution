@@ -15,6 +15,7 @@ class Game_object:
 
     def add_child(self, game_object):
         self.children.append(game_object)
+        game_object.set_parent(self)
 
     def set_parent(self, parent):
         self.parent = parent
@@ -31,6 +32,8 @@ class Game_object:
             child.chain_update(surface)
 
     def update(self, surface):
+        self.global_position = vector_math.add_vector2([0,0], self.local_position)
+        self.global_rotation = self.local_rotation
         self.normalize_rotation()
         pg.draw.line(surface, (255,255,255), self.global_position, self.get_global_endpos())
         for child in self.children:
