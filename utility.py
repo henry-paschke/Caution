@@ -1,6 +1,6 @@
 import pygame as pg
 import json
-
+ 
 g_debug_font = pg.font.Font(None, 16)
 
 def stamp_text(lines, surf, pos):
