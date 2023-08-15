@@ -1,3 +1,4 @@
+import snakeviz
 import pygame as pg
 pg.init()
 
@@ -6,6 +7,9 @@ import math
 import utility
 from globals import *
 import keyframe_animation
+
+#python -m cProfile -o main.prof main.py
+#snakeviz main.prof
 
 pg.init()
 
@@ -34,17 +38,10 @@ arm = pg.transform.scale(img, (ARM_LENGTH * 2, ARM_LENGTH * 2))
 leg = pg.transform.scale(img, (LEG_LENGTH * 2, LEG_LENGTH * 2))
 body = pg.transform.scale(img, (240,360))
 head = pg.transform.scale(img, (75,300))
-go = game_object.Game_object([500, SCREEN_SIZE[1] - 30], 0, 100, "Base", None)
-go.add_child(game_object.Game_object([0, -130], -math.pi / 2, 100, "Spine", body))
-go.children[0].add_child(game_object.Game_object([0, -30], -math.pi / 2, ARM_LENGTH, "Left_arm_top", arm))
-go.seek_first_child("Left_arm_top").add_child(game_object.Game_object([-ARM_LENGTH, 0], -math.pi / 4, ARM_LENGTH, "Left_arm_bottom", arm))
-go.children[0].add_child(game_object.Game_object([-100, 30], math.pi / 8 * 5, ARM_LENGTH, "Right_arm_top", arm))
-go.seek_first_child("Right_arm_top").add_child(game_object.Game_object([-ARM_LENGTH, 14], -math.pi / 4, ARM_LENGTH, "Right_arm_bottom", arm))
-go.children[0].add_child(game_object.Game_object([0, -30], 3.9, LEG_LENGTH, "Left_leg_top", leg))
-go.seek_first_child("Left_leg_top").add_child(game_object.Game_object([-LEG_LENGTH, 0], -math.pi / 3, LEG_LENGTH, "Left_leg_bottom", leg))
-go.children[0].add_child(game_object.Game_object([0, 30], 2.5, LEG_LENGTH, "Right_leg_top", leg))
-go.seek_first_child("Right_leg_top").add_child(game_object.Game_object([-LEG_LENGTH, 0], .3, LEG_LENGTH, "Right_leg_bottom", leg))
-go.children[0].add_child(game_object.Game_object([-140, 0], 0, 30, "Head", head))
+
+image_list = [None, [[body, [[arm, [[arm, []]]], [arm, [[arm, []]]], [leg, [[leg, []]]], [leg, [[leg, []]]], [head, []]]]]]
+
+go = game_object.create_game_object_from_file("skeletons/human.ske", image_list)
 
 go.selected = True
 g_selected = go
@@ -95,8 +92,8 @@ while g_running:
             if (e.key == pg.K_SPACE):
                 g_playing = not g_playing
             if (e.key == pg.K_1):
-                animation.change_animation(g_frame_edit_number, go.serialize_data())
                 keyframes[g_frame_edit_number] = go.serialize_data()
+                animation.change_animation(g_frame_edit_number, go.serialize_data())
                 console_log("changed frame " + str(g_frame_edit_number) + " to current pose")
             if (e.key == pg.K_LEFTBRACKET):
                 g_frame_edit_number -= 1
@@ -109,6 +106,7 @@ while g_running:
                     g_frame_edit_number = 0
                 go.read_serialized_data(keyframes[g_frame_edit_number])
             if (e.key == pg.K_2):
+                print(keyframes)
                 utility.save_to_json(g_json_filepath, keyframes)
             if (e.key == pg.K_3):
                 print("type the name of the file:")

@@ -2,6 +2,7 @@ import pygame as pg
 import math
 import vector_math
 from globals import *
+import utility
 
 class Target:
     def __init__(self, position : list[float, float], rotation : float, time = -1):
@@ -20,6 +21,17 @@ def create_keyframe_from_serialized(data, time):
         output[1].append(create_keyframe_from_serialized(data[2][i], time))
     return output
 
+def create_game_object_from_structure_list(structure_list):
+    go = Game_object([0,0], 0, 100, structure_list[0], None)
+    for entry in structure_list[1]:
+        go.add_child(create_game_object_from_structure_list(entry))
+    return go
+
+def create_game_object_from_file(fp, image_list):
+    structure = utility.read_from_json(fp)
+    go = create_game_object_from_structure_list(structure)
+    go.apply_image_list(image_list)
+    return go
 
 
 class Game_object:
@@ -190,5 +202,14 @@ class Game_object:
         console_log("No sibling of selected object " + self.name)
         return self
             
+    def get_structure_list(self):
+        data = [self.name, []]
+        for child in self.children:
+            data[1].append(child.get_structure_list())
+        return data
 
-
+    def apply_image_list(self, img_list):
+        self.img = img_list[0]
+        for i in range(len(img_list[1])):
+            self.children[i].apply_image_list(img_list[1][i])
+            

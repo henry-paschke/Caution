@@ -23,14 +23,7 @@ def lerp(start, target, elapsed, total_time):
     fraction_time = elapsed / total_time
     total_distance = target - start
     return start + (fraction_time * total_distance)
-
-def erp(start, target, elapsed, total_time):
-    total_distance = target - start
-    if total_distance == 0:
-        return start
-    k = math.log(target) / total_time
-    return start * math.exp(k * elapsed)
-    
+ 
 
 
 #amount = start * e ^ k*t
