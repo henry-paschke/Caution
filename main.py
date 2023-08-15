@@ -12,6 +12,7 @@ pg.init()
 #constants
 SCREEN_SIZE = (960, 540)
 BLACK  = (0,0,0)
+ANIMATIONS_DIR = "animations/"
 
 g_running = True
 g_screen_surface = pg.display.set_mode(SCREEN_SIZE)
@@ -22,8 +23,8 @@ g_playing = True
 g_console_hidden = False
 g_debug_font = pg.font.Font(None, 20)
 g_frame_edit_number = 0
-g_json_filepath = "animations/run.anim"
-
+g_json_filepath = ANIMATIONS_DIR + "idle.anim"
+g_clipboard = []
 g_animating = True
 
 ARM_LENGTH = 60
@@ -68,7 +69,7 @@ while g_running:
                  "\\/ select parent", "WASD : edit local position (alt to free move)", str(g_selected.local_position),
                   "QE : local rotation, ctrl to fine-tune", str(g_selected.local_rotation),
                   "frame number: " + str(animation.frame), "1 and []: override/change frame number " + str(g_frame_edit_number),
-                  "2 : print current animation as serialized data", "3 : snap to frame number " + str(g_frame_edit_number),
+                  "2 : save current animation as " + g_json_filepath, "3 : save as new",
                   "4 : save this pose as a new frame", "frame count : " + str(len(keyframes))
                   ]
     utility.stamp_text(debug_str, g_screen_surface, (20,20))
@@ -96,17 +97,25 @@ while g_running:
                 g_frame_edit_number -= 1
                 if g_frame_edit_number < 0:
                     g_frame_edit_number = len(animation.keyframe_list) - 1
+                go.read_serialized_data(keyframes[g_frame_edit_number])
             if (e.key == pg.K_RIGHTBRACKET):
                 g_frame_edit_number += 1
                 if g_frame_edit_number >= len(animation.keyframe_list):
                     g_frame_edit_number = 0
+                go.read_serialized_data(keyframes[g_frame_edit_number])
             if (e.key == pg.K_2):
                 utility.save_to_json(g_json_filepath, keyframes)
             if (e.key == pg.K_3):
-                go.read_serialized_data(keyframes[g_frame_edit_number])
+                print("type the name of the file:")
+                g_json_filepath = ANIMATIONS_DIR + input() + ".anim"
+                utility.save_to_json(g_json_filepath, keyframes)
             if (e.key == pg.K_4):
                 keyframes.append(go.serialize_data())
                 animation.add_frame(go.serialize_data())
+            if (e.key == pg.K_c):
+                g_clipboard = go.serialize_data()
+            if (e.key == pg.K_v):
+                go.read_serialized_data(g_clipboard)
             if (not k[pg.K_LSHIFT]):
                 if (e.key == pg.K_d):
                     g_selected.local_position[0] += 1
