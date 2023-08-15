@@ -22,3 +22,6 @@ class Keyframe_animation:
 
     def change_animation(self, id_number, serialized_data):
         self.keyframe_list[id_number] = game_object.create_keyframe_from_serialized(serialized_data, self.interval)
+    
+    def add_frame(self, serialized_data):
+        self.keyframe_list.append(game_object.create_keyframe_from_serialized(serialized_data, self.interval))
