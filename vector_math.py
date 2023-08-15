@@ -24,6 +24,19 @@ def lerp(start, target, elapsed, total_time):
     total_distance = target - start
     return start + (fraction_time * total_distance)
 
+def erp(start, target, elapsed, total_time):
+    total_distance = target - start
+    if total_distance == 0:
+        return start
+    k = math.log(target) / total_time
+    return start * math.exp(k * elapsed)
+    
+
+
+#amount = start * e ^ k*t
+#ln amount = k * t
+#k = ln amount / t
+
 def angular_lerp(start, target, elapsed, total_time):
     fraction_time = elapsed / total_time
     total_distance = target - start
@@ -35,4 +48,6 @@ def angular_lerp(start, target, elapsed, total_time):
     
     interpolated_angle = start + total_distance * fraction_time
     return interpolated_angle
-        
+
+def radians_to_degrees(rads : float):
+    return rads / math.pi * 180     

@@ -23,7 +23,7 @@ def create_keyframe_from_serialized(data, time):
 
 
 class Game_object:
-    def __init__(self, position, rotation_radians, length, name):
+    def __init__(self, position, rotation_radians, length, name, img):
         self.local_position = position
         self.local_rotation = rotation_radians
         self.parent = None
@@ -36,6 +36,7 @@ class Game_object:
         self.elapsed = 0
         self.target_startpos = None
         self.selected = False
+        self.img = img
 
     def add_child(self, game_object):
         self.children.append(game_object)
@@ -150,6 +151,10 @@ class Game_object:
             child.draw_recursive(surface)
     
     def draw(self, surface):
+        if (self.img):
+            rotatedimg = pg.transform.rotate(self.img, -vector_math.radians_to_degrees(self.global_rotation))
+            surface.blit(rotatedimg, vector_math.add_vector2(self.global_position, (-rotatedimg.get_width() / 2, -rotatedimg.get_height() / 2)))
+        
         if self.selected:
             pg.draw.line(surface, (255,0,0), self.global_position, vector_math.get_endpos(self.global_position, self.global_rotation, self.length, 0), 5)
         else :
