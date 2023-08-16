@@ -6,6 +6,8 @@ import math
 import utility
 from globals import *
 import keyframe_animation
+import vector_math
+import copy
 
 #constants
 RES_SCALE = 1.5
@@ -50,11 +52,12 @@ animation = keyframe_animation.Keyframe_animation(go, keyframes, 500)
 
 g_window.blit(pg.transform.scale(g_screen_surface, SCREEN_SIZE), (0, 0))
 while g_running:
+    animation.reset_keyframe_list(keyframes)
     g_screen_surface.fill(BLACK)
     g_clock.tick()
     g_elapsed += g_clock.get_rawtime()
     k = pg.key.get_pressed()
-
+    kf = keyframes.copy()
 
     go.update(g_screen_surface, g_clock.get_rawtime(), g_playing)
 
@@ -69,7 +72,8 @@ while g_running:
                   "QE : local rotation, ctrl to fine-tune", str(g_selected.local_rotation),
                   "frame number: " + str(animation.frame), "1 and []: override/change frame number " + str(g_frame_edit_number),
                   "2 : save current animation as " + g_json_filepath, "3 : save as new",
-                  "4 : save this pose as a new frame", "frame count : " + str(len(keyframes))
+                  "4 : save this pose as a new frame", "frame count : " + str(len(keyframes)),
+                  str(keyframes)
                   ]
     utility.stamp_text(debug_str, g_screen_surface, (20,20))
     utility.stamp_text(g_console, g_screen_surface, (SCREEN_SIZE[0]- 260, 0))
@@ -89,8 +93,9 @@ while g_running:
             if (e.key == pg.K_SPACE):
                 g_playing = not g_playing
             if (e.key == pg.K_1):
-                keyframes[g_frame_edit_number] = go.serialize_data()
-                animation.change_animation(g_frame_edit_number, go.serialize_data())
+                data = copy.deepcopy(go.serialize_data())
+                keyframes[g_frame_edit_number] = data
+                animation.change_animation(g_frame_edit_number, data)
                 console_log("changed frame " + str(g_frame_edit_number) + " to current pose")
             if (e.key == pg.K_LEFTBRACKET):
                 g_frame_edit_number -= 1
@@ -177,6 +182,9 @@ while g_running:
         else:
             g_selected.local_rotation += g_clock.get_rawtime() /400
 
+    #pg.draw.circle(g_screen_surface, (255,0,0), vector_math.add_vector2(go.children[0].target.position, (250, 200)), 20)
+    if (kf != keyframes):
+        print("alert")
 
     g_window.blit(pg.transform.scale(g_screen_surface, pg.display.get_window_size()), (0, 0))
     pg.display.flip()

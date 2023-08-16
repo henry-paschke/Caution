@@ -19,7 +19,7 @@ g_running = True
 g_screen_surface = pg.display.set_mode(SCREEN_SIZE, pg.HWSURFACE | pg.DOUBLEBUF | pg.SCALED | pg.RESIZABLE)
 g_clock = pg.time.Clock()
 g_debug_font = pg.font.Font(None, 20)
-g_json_filepath = ANIMATIONS_DIR + "run.anim"
+g_json_filepath = ANIMATIONS_DIR + "idle.anim"
 
 ARM_LENGTH = 60
 LEG_LENGTH = 70

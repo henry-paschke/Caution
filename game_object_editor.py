@@ -90,6 +90,7 @@ class Game_object:
                 self.local_position[1] = self.target.Ypos()
                 self.local_rotation = self.target.rotation
                 self.target = None
+        
 
     def normalize_rotation(self):
         self.local_rotation = vector_math.normalize_radian_angle(self.local_rotation)
@@ -118,10 +119,10 @@ class Game_object:
         return data
     
     def read_serialized_data(self, data):
-        self.local_position = data[0]
+        self.local_position = data[0].copy()
         self.local_rotation = data[1]
         for i in range(len(data[2])):
-            self.children[i].read_serialized_data(data[2][i])
+            self.children[i].read_serialized_data(data[2][i].copy())
 
     def seek_first_child(self, name_string):
         for child in self.children:
