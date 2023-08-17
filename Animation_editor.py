@@ -33,6 +33,7 @@ g_assets = []
 go = game_object_editor.create_game_object_from_file("skeletons/human.ske", g_assets)
 
 g_selected = go
+g_selected.select_first_child()
 
 data = utility.read_from_json(g_json_filepath)
 keyframes = data["frames"]

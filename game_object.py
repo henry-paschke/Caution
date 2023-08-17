@@ -54,7 +54,6 @@ class Game_object:
         self.elapsed = 0
         self.target_startpos = None
         self.img = img
-        self.half_img = (0,0)
 
     def add_child(self, game_object):
         self.children.append(game_object)
@@ -139,6 +138,7 @@ class Game_object:
     def apply_image_list(self, img_list, textures):
         if img_list[0] != None:
             self.img = textures[img_list[0]]
+            self.img = self.img.convert_alpha()
         for i in range(len(img_list[1])):
             self.children[i].apply_image_list(img_list[1][i], textures)
    
