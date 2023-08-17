@@ -13,6 +13,7 @@ import copy
 RES_SCALE = 1.5
 SCREEN_SIZE = (960 * RES_SCALE, 540 * RES_SCALE)
 BLACK  = (0,0,0)
+WHITE = (255,255,255)
 ANIMATIONS_DIR = "animations/"
 
 g_running = True
@@ -27,33 +28,23 @@ g_debug_font = pg.font.Font(None, 20)
 g_frame_edit_number = 0
 g_json_filepath = ANIMATIONS_DIR + "idle.anim"
 g_clipboard = []
+g_assets = []
 
-ARM_LENGTH = 60
-LEG_LENGTH = 70
-img = pg.image.load("arm.png").convert_alpha()
-arm = pg.transform.scale(img, (ARM_LENGTH * 2, ARM_LENGTH * 2))
-leg = pg.transform.scale(img, (LEG_LENGTH * 2, LEG_LENGTH * 2))
-body = pg.transform.scale(img, (240,360))
-head = pg.transform.scale(img, (75,300))
+go = game_object_editor.create_game_object_from_file("skeletons/human.ske", g_assets)
 
-image_list = [None, [[body, [[arm, [[arm, []]]], [arm, [[arm, []]]], [leg, [[leg, []]]], [leg, [[leg, []]]], [head, []]]]]]
-
-go = game_object_editor.create_game_object_from_file("skeletons/human.ske", image_list)
-
-go.selected = True
 g_selected = go
 
-keyframes = utility.read_from_json(g_json_filepath)
+data = utility.read_from_json(g_json_filepath)
+keyframes = data["frames"]
+intervals = data["times"]
 
 go.read_serialized_data(keyframes[0])
 
-animation = keyframe_animation.Keyframe_animation(go, keyframes, 500)
+animation = keyframe_animation.Keyframe_animation(go, keyframes, intervals)
 
 
-g_window.blit(pg.transform.scale(g_screen_surface, SCREEN_SIZE), (0, 0))
 while g_running:
-    animation.reset_keyframe_list(keyframes)
-    g_screen_surface.fill(BLACK)
+    g_screen_surface.fill(WHITE)
     g_clock.tick()
     g_elapsed += g_clock.get_rawtime()
     k = pg.key.get_pressed()
@@ -73,7 +64,8 @@ while g_running:
                   "frame number: " + str(animation.frame), "1 and []: override/change frame number " + str(g_frame_edit_number),
                   "2 : save current animation as " + g_json_filepath, "3 : save as new",
                   "4 : save this pose as a new frame", "frame count : " + str(len(keyframes)),
-                  str(keyframes)
+                  str(keyframes), "Frame " + str(g_frame_edit_number) + " length in Ms : " + str(intervals[g_frame_edit_number]),
+                  "comma/period : change length of frame"
                   ]
     utility.stamp_text(debug_str, g_screen_surface, (20,20))
     utility.stamp_text(g_console, g_screen_surface, (SCREEN_SIZE[0]- 260, 0))
@@ -92,10 +84,10 @@ while g_running:
                 g_selected = g_selected.select_first_child()  
             if (e.key == pg.K_SPACE):
                 g_playing = not g_playing
-            if (e.key == pg.K_1):
+            if (e.key == pg.K_1): # this is the number one not the letter L
                 data = copy.deepcopy(go.serialize_data())
                 keyframes[g_frame_edit_number] = data
-                animation.change_animation(g_frame_edit_number, data)
+                animation.change_animation(g_frame_edit_number, data, intervals[g_frame_edit_number])
                 console_log("changed frame " + str(g_frame_edit_number) + " to current pose")
             if (e.key == pg.K_LEFTBRACKET):
                 g_frame_edit_number -= 1
@@ -108,25 +100,44 @@ while g_running:
                     g_frame_edit_number = 0
                 go.read_serialized_data(keyframes[g_frame_edit_number])
             if (e.key == pg.K_2):
-                print(keyframes)
-                utility.save_to_json(g_json_filepath, keyframes)
+                console_log("Saved!")
+                save_data = {
+                    "frames" : keyframes,
+                    "times" : intervals
+                }
+                utility.save_to_json(g_json_filepath, save_data)
             if (e.key == pg.K_3):
                 print("type the name of the file:")
                 g_json_filepath = ANIMATIONS_DIR + input() + ".anim"
+                open(g_json_filepath, "x")
                 utility.save_to_json(g_json_filepath, keyframes)
-            if (e.key == pg.K_l):
+            if (e.key == pg.K_l): # this is the letter L not the number one
                 print("type the name of the file:")
                 g_json_filepath = ANIMATIONS_DIR + input() + ".anim"
-                keyframes = utility.read_from_json(g_json_filepath)
+                load_data = utility.read_from_json(g_json_filepath)
+                keyframes = load_data["frames"]
+                intervals = load_data["times"]
                 go.read_serialized_data(keyframes[0])
-                animation = keyframe_animation.Keyframe_animation(go, keyframes, 500)
+                animation = keyframe_animation.Keyframe_animation(go, keyframes, intervals)
             if (e.key == pg.K_4):
                 keyframes.append(go.serialize_data())
-                animation.add_frame(go.serialize_data())
+                intervals.append(intervals[g_frame_edit_number])
+                animation.add_frame(go.serialize_data(), intervals[g_frame_edit_number])
             if (e.key == pg.K_c):
                 g_clipboard = go.serialize_data()
             if (e.key == pg.K_v):
                 go.read_serialized_data(g_clipboard)
+            if (e.key == pg.K_COMMA):
+                value = intervals[g_frame_edit_number] - 25
+                if (intervals[g_frame_edit_number] < 25):
+                    value = 25
+                intervals[g_frame_edit_number] = value
+                animation.change_animation(g_frame_edit_number, keyframes[g_frame_edit_number], value)
+
+            if (e.key == pg.K_PERIOD):
+                value = intervals[g_frame_edit_number] + 25
+                intervals[g_frame_edit_number] = value
+                animation.change_animation(g_frame_edit_number, keyframes[g_frame_edit_number], value)
             if (not k[pg.K_LSHIFT]):
                 if (e.key == pg.K_d):
                     g_selected.local_position[0] += 1

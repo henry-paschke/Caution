@@ -27,10 +27,17 @@ def create_game_object_from_structure_list(structure_list):
         go.add_child(create_game_object_from_structure_list(entry))
     return go
 
-def create_game_object_from_file(fp, image_list):
+def create_game_object_from_file(fp, assets):
     structure = utility.read_from_json(fp)
-    go = create_game_object_from_structure_list(structure)
-    go.apply_image_list(image_list)
+    go = create_game_object_from_structure_list(structure["armature"])
+    texture_path = structure["path"]
+    texture = pg.image.load(texture_path)
+    assets.append(texture)
+    size = structure["size"]
+    texture_list = []
+    for i in range(int(texture.get_width() / size)):
+        texture_list.append(texture.subsurface( i*size, 0, size, size))
+    go.apply_image_list(structure["image_references"], texture_list)
     return go
 
 
@@ -129,13 +136,12 @@ class Game_object:
         for i in range(len(data[2])):
             self.children[i].read_serialized_data(data[2][i])
 
-    def apply_image_list(self, img_list):
-        self.img = img_list[0]
-        self.half_img = []
+    def apply_image_list(self, img_list, textures):
+        if img_list[0] != None:
+            self.img = textures[img_list[0]]
         for i in range(len(img_list[1])):
-            self.children[i].apply_image_list(img_list[1][i])
-
+            self.children[i].apply_image_list(img_list[1][i], textures)
+   
     def get_current_as_target(self):
         self.normalize_rotation()
-        return Target(self.local_position, self.local_rotation)
-            
+        return Target(self.local_position, self.local_rotation)           

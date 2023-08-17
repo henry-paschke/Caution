@@ -27,10 +27,17 @@ def create_game_object_from_structure_list(structure_list):
         go.add_child(create_game_object_from_structure_list(entry))
     return go
 
-def create_game_object_from_file(fp, image_list):
+def create_game_object_from_file(fp, assets):
     structure = utility.read_from_json(fp)
-    go = create_game_object_from_structure_list(structure)
-    go.apply_image_list(image_list)
+    go = create_game_object_from_structure_list(structure["armature"])
+    texture_path = structure["path"]
+    texture = pg.image.load(texture_path)
+    assets.append(texture)
+    size = structure["size"]
+    texture_list = []
+    for i in range(int(texture.get_width() / size)):
+        texture_list.append(texture.subsurface( i*size, 0, size, size))
+    go.apply_image_list(structure["image_references"], texture_list)
     return go
 
 
@@ -171,7 +178,7 @@ class Game_object:
         if self.selected:
             pg.draw.line(surface, (255,0,0), self.global_position, vector_math.get_endpos(self.global_position, self.global_rotation, self.length, 0), 5)
         else :
-            pg.draw.line(surface, (255,255,255), self.global_position, vector_math.get_endpos(self.global_position, self.global_rotation, self.length, 0))
+            pg.draw.line(surface, (0,255,0), self.global_position, vector_math.get_endpos(self.global_position, self.global_rotation, self.length, 0), 3)
     
     def select_parent(self):
         if self.parent:
@@ -209,8 +216,9 @@ class Game_object:
             data[1].append(child.get_structure_list())
         return data
 
-    def apply_image_list(self, img_list):
-        self.img = img_list[0]
+    def apply_image_list(self, img_list, textures):
+        if img_list[0] != None:
+            self.img = textures[img_list[0]]
         for i in range(len(img_list[1])):
-            self.children[i].apply_image_list(img_list[1][i])
+            self.children[i].apply_image_list(img_list[1][i], textures)
             
