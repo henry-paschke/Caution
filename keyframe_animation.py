@@ -1,5 +1,6 @@
 import game_object_editor
 import utility
+import copy
 
 class Keyframe_animation:
     def __init__(self, object, serialized_list, intervals):
@@ -26,10 +27,10 @@ class Keyframe_animation:
     def add_frame(self, serialized_data, length):
         self.keyframe_list.append(game_object_editor.create_keyframe_from_serialized(serialized_data, length))
 
-    def reset_keyframe_list(self, serialized_list):
+    def reset_keyframe_list(self, keyframe_list, intervals):
         self.keyframe_list.clear()
-        for e in serialized_list.copy():
-            self.keyframe_list.append(game_object_editor.create_keyframe_from_serialized(e, self.interval))
+        for i in range(len(keyframe_list)):
+            self.keyframe_list.append(game_object_editor.create_keyframe_from_serialized(keyframe_list[i], intervals[i]))
 
 
 def create_animation(fp, go):

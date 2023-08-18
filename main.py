@@ -29,7 +29,7 @@ animation = keyframe_animation.create_animation("animations/slip.anim", go)
 
 gos = []
 ans = []
-for i in range(4):
+for i in range(0):
     gos.append(game_object.create_game_object_from_file("skeletons/human.ske", g_assets))
     ans.append(keyframe_animation.create_animation("animations/slip.anim", gos[i]))
     gos[i].local_position = (random.randint(0, 1920), random.randint(0, 1080))

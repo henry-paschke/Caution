@@ -55,6 +55,13 @@ while g_running:
 
     if g_playing:
         animation.update(g_clock.get_rawtime())
+
+    frames_string = ''
+    for i in range(len(keyframes)):
+        if i == g_frame_edit_number:
+            frames_string += ("{" + str(i) + "} ")
+        else:
+            frames_string += (" " + str(i) + "  ")
     
     debug_str = ["filepath: " + g_json_filepath,
                  "FPS : " + str(g_clock.get_fps()),
@@ -66,7 +73,7 @@ while g_running:
                   "2 : save current animation as " + g_json_filepath, "3 : save as new",
                   "4 : save this pose as a new frame", "frame count : " + str(len(keyframes)),
                   str(keyframes), "Frame " + str(g_frame_edit_number) + " length in Ms : " + str(intervals[g_frame_edit_number]),
-                  "comma/period : change length of frame"
+                  "comma/period : change length of frame", frames_string, "5 : duplicate left, 6 : duplicate right"
                   ]
     utility.stamp_text(debug_str, g_screen_surface, (20,20))
     utility.stamp_text(g_console, g_screen_surface, (SCREEN_SIZE[0]- 260, 0))
@@ -124,6 +131,14 @@ while g_running:
                 keyframes.append(go.serialize_data())
                 intervals.append(intervals[g_frame_edit_number])
                 animation.add_frame(go.serialize_data(), intervals[g_frame_edit_number])
+            if (e.key == pg.K_5):
+                keyframes.insert(g_frame_edit_number - 1, copy.deepcopy(keyframes[g_frame_edit_number]))
+                intervals.insert(g_frame_edit_number - 1, intervals[g_frame_edit_number])
+                animation.reset_keyframe_list(keyframes, intervals)
+            if (e.key == pg.K_6):
+                keyframes.insert(g_frame_edit_number, copy.deepcopy(keyframes[g_frame_edit_number]))
+                intervals.insert(g_frame_edit_number, intervals[g_frame_edit_number])
+                animation.reset_keyframe_list(keyframes, intervals)
             if (e.key == pg.K_c):
                 g_clipboard = go.serialize_data()
             if (e.key == pg.K_v):
