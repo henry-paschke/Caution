@@ -48,9 +48,8 @@ class Physics_object:
             else:
                 self.hitbox.left = other_hitbox.right
         if len(hitlist):
-            print("bounece")
             self.velocity[0] = -self.velocity[0] * 0.5
-            self.velocity[1] = -self.velocity[1] * 0.5
+            self.velocity[1] = self.velocity[1] * 0.5
 
         
         #print(self.velocity)

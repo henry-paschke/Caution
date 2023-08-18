@@ -213,6 +213,7 @@ while g_running:
     if (kf != keyframes):
         print("alert")
 
+    #pg.draw.rect(g_screen_surface, (0,0, 255), (SCREEN_SIZE[0] / 2 - 5, (SCREEN_SIZE[1] - (SCREEN_SIZE[1] / 3)) - 5, 10, 10))
     g_window.blit(pg.transform.scale(g_screen_surface, pg.display.get_window_size()), (0, 0))
     pg.display.flip()
         

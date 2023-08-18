@@ -38,15 +38,15 @@ while playing:
 
     k = pg.key.get_pressed()
     if (k[pg.K_d] and test.grounded):
-        if test.velocity[0] >= 0:
+        if test.velocity[0] > 0:
             test.velocity[0] = test.velocity[0] + 0.0007 * d_time
         else:
-            test.velocity[0] = 0
+            test.velocity[0] = .3
     elif (k[pg.K_a] and test.grounded):
-        if test.velocity[0] <= 0:
+        if test.velocity[0] < 0:
             test.velocity[0] = test.velocity[0] - 0.0007 * d_time
         else:
-            test.velocity[0] = 0
+            test.velocity[0] = -.3
     elif test.grounded:
         test.velocity[0] = test.velocity[0] * 0.07 * d_time
 

@@ -72,9 +72,9 @@ class Game_object:
             child.chain_update(surface, delta_time)
 
     #TODO remove duplicate code 
-    def update(self, surface, delta_time):
+    def update(self, surface, delta_time, offset=[0,0]):
         #self.update_target(delta_time)
-        self.global_position = vector_math.add_vector2([0,0], self.local_position)
+        self.global_position = vector_math.add_vector2(offset, self.local_position)
         self.global_rotation = self.local_rotation
         self.normalize_rotation()
         self.draw(surface)
