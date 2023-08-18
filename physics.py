@@ -34,25 +34,26 @@ class Physics_object:
                 else:
                     self.hitbox.top = other_hitbox.bottom
             if len(hitlist):
-                self.velocity[1] = - self.velocity[1] * 0.1
+                self.velocity[1] = -self.velocity[1] * 0.5
                 if abs(self.velocity[1]) < 0.1:
                     self.velocity[1] = 0
                     self.grounded = True
 
-            self.hitbox.x += self.velocity[0] * d_time
+        self.hitbox.x += self.velocity[0] * d_time
 
-            hitlist = self.get_hit_list(hitbox_list)
-            for other_hitbox in hitlist:
-                if self.velocity[0] > 0:
-                    self.hitbox.bottom = other_hitbox.top
-                else:
-                    self.hitbox.top = other_hitbox.bottom
-            if len(hitlist):
-                self.velocity[0] = - self.velocity[0] * 0.1
-                if abs(self.velocity[0]) < 0.1:
-                    self.velocity[0] = 0
+        hitlist = self.get_hit_list(hitbox_list)
+        for other_hitbox in hitlist:
+            if self.velocity[0] > 0:
+                self.hitbox.right = other_hitbox.left
+            else:
+                self.hitbox.left = other_hitbox.right
+        if len(hitlist):
+            print("bounece")
+            self.velocity[0] = -self.velocity[0] * 0.5
+            self.velocity[1] = -self.velocity[1] * 0.5
+
         
-        print(self.velocity)
+        #print(self.velocity)
         
 
     def get_hit_list(self, hitboxes):
