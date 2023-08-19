@@ -25,7 +25,7 @@ class Physics_object:
         
 
     def collide_with_objects(self, hitbox_list, d_time):
-        bounce = 0.7
+        bounce = 0.5
         if self.grounded == False:
             self.hitbox.y += self.velocity[1] * d_time
 

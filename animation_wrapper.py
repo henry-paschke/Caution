@@ -17,9 +17,11 @@ class Animation_wrapper:
         self.current = initial_animation_path
         self.flip = False
 
-    def update(self, surface, d_t, position):
+    def update(self,surface,d_t, position):
         self.surf.fill((0,0,0,0))
-        self.go.update(self.surf, d_t, [-300,0])
+        bl = []
+        self.go.update(d_t, bl, [-300,0])
+        self.surf.blits(bl)
         self.animation.update(d_t)
 
         surface.blit(pg.transform.flip(self.surf, self.flip, False), position)

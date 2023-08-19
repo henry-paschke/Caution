@@ -64,24 +64,24 @@ class Game_object:
     def set_parent(self, parent):
         self.parent = parent
 
-    def chain_update(self, surface, delta_time):
+    def chain_update(self, delta_time, blit_list):
         self.update_target(delta_time)
         self.global_rotation = self.parent.global_rotation + self.local_rotation
         self.global_position = vector_math.get_endpos(self.parent.global_position, self.parent.global_rotation, -self.local_position[0], -self.local_position[1])
         self.normalize_rotation()
-        self.draw(surface)
+        self.draw(blit_list)
         for child in self.children:
-            child.chain_update(surface, delta_time)
+            child.chain_update(delta_time, blit_list)
 
     #TODO remove duplicate code 
-    def update(self, surface, delta_time, offset=[0,0]):
+    def update(self, delta_time, blit_list, offset=[0,0]):
         #self.update_target(delta_time)
         self.global_position = vector_math.add_vector2(offset, self.local_position)
         self.global_rotation = self.local_rotation
         self.normalize_rotation()
-        self.draw(surface)
+        self.draw(blit_list)
         for child in self.children:
-            child.chain_update(surface, delta_time)
+            child.chain_update(delta_time, blit_list)
 
     def update_target(self, delta_time):
         if (self.target):
@@ -126,10 +126,10 @@ class Game_object:
         for child in self.children:
             child.draw_recursive(surface)
     
-    def draw(self, surface):
+    def draw(self, blit_list):
         if (self.img and self.invisible == False):
             rotatedimg = pg.transform.rotate(self.img, -vector_math.radians_to_degrees(self.global_rotation))
-            surface.blit(rotatedimg, vector_math.add_vector2(self.global_position, (-rotatedimg.get_width() / 2, -rotatedimg.get_height() / 2)))
+            blit_list.append((rotatedimg, vector_math.add_vector2(self.global_position, (-rotatedimg.get_width() / 2, -rotatedimg.get_height() / 2))))
 
     def read_serialized_data(self, data):
         self.local_position = data[0]
@@ -152,6 +152,8 @@ class Game_object:
         self.invisible = True
         if self.img:
             particle_list.append(particle.Particle(self.img, vector_math.add_vector2(offset, self.global_position), self.global_rotation, 4, vel))
+        for i in range(10):
+            particle_list.append(particle.Blood(vector_math.add_vector2(offset, self.global_position)))
         for child in self.children:
             child.gib(particle_list, offset, vel)
 

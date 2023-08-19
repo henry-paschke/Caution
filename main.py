@@ -5,6 +5,8 @@ import utility
 import animation_wrapper
 import physics
 import camera
+import particle
+
 
 #python -m cProfile -o main.prof main.py   
 #python -m snakeviz main.prof -b windows-default
@@ -43,7 +45,7 @@ spike = pg.image.load("spike.png")
 
 while g_running:
     g_screen_surface.surface.fill(WHITE)
-    d_t = g_clock.tick_busy_loop(120)
+    d_t = g_clock.tick_busy_loop()
     
     utility.stamp_text([str(g_clock.get_fps())], g_screen_surface, (20,20))
 
@@ -54,8 +56,11 @@ while g_running:
     for f in floors:
         g_screen_surface.draw_rect(f, (0,0,0))
 
-    for p in g_particles:
-        p.update(g_screen_surface, floors, d_t)
+    for i in range(len(g_particles)):
+        g_particles[i].update(g_screen_surface, floors, d_t)
+
+    particle.remove_dead_objects(g_particles)
+    print(len(g_particles))
 
     for e in pg.event.get():
         if e.type == pg.QUIT:
@@ -72,24 +77,24 @@ while g_running:
                 player_body.grounded = False
                 go.switch_animation("jump")
             if e.key == pg.K_0:
-                player_body = physics.Physics_object(0,0,300,350, 4)
-                go.go.set_visible()
-
-    if (player_body.impact and player_body.grounded == False):
-        go.switch_animation("tumble")    
-
-    k = pg.key.get_pressed()
-    if (k[pg.K_d]):
-        if player_body.grounded:
-            go.switch_animation("walk")
-            go.flip = False
-        if player_body.velocity[0] > 0:
-            player_body.velocity[0] = player_body.velocity[0] + 0.0007 * d_t
-        else:
-            player_body.velocity[0] = .3
-    elif (k[pg.K_a]):
-        if player_body.grounded:
-            go.switch_animation("walk")
+                player_body = physics.Physics_object(0,0,300,350, 4)       
+                go.go.set_visible()       
+       
+    if (player_body.impact and player_body.grounded == False):       
+        go.switch_animation("tumble")           
+       
+    k = pg.key.get_pressed()       
+    if (k[pg.K_d]):       
+        if player_body.grounded:       
+            go.switch_animation("walk")       
+            go.flip = False       
+        if player_body.velocity[0] > 0:       
+            player_body.velocity[0] = player_body.velocity[0] + 0.0007 * d_t       
+        else:       
+            player_body.velocity[0] = .3       
+    elif (k[pg.K_a]):       
+        if player_body.grounded:       
+            go.switch_animation("walk")       
             go.flip = True
         if player_body.velocity[0] < 0:
             player_body.velocity[0] = player_body.velocity[0] - 0.0007 * d_t
