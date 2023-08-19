@@ -15,13 +15,14 @@ class Animation_wrapper:
         for i in paths:
             self.animation_data[str(i)] = animation_data.Animation_data("animations/" + str(i) + ".anim")
         self.current = initial_animation_path
+        self.flip = False
 
     def update(self, surface, d_t, position):
         self.surf.fill((0,0,0,0))
         self.go.update(self.surf, d_t, [-300,0])
         self.animation.update(d_t)
 
-        surface.blit(self.surf, position)
+        surface.blit(pg.transform.flip(self.surf, self.flip, False), position)
 
     def switch_animation(self, name):
         t = pg.time.get_ticks()

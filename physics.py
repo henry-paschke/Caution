@@ -13,13 +13,14 @@ class Physics_object:
         self.velocity = [0, 0]
         self.weight = weight
         self.grounded = False
+        self.impact = False
     
     def draw(self, screen):
         pg.draw.rect(screen, RED, self.hitbox)
 
     def update(self, d_time):
         if self.grounded == False:
-            gravity = 0.00000981 * 100.0
+            gravity = 0.000981
             self.velocity[1] += gravity * d_time * self.weight
         
 
@@ -36,7 +37,8 @@ class Physics_object:
                     self.hitbox.top = other_hitbox.bottom
             if len(hitlist):
                 self.velocity[1] = -self.velocity[1] * bounce
-                if abs(self.velocity[1]) < 0.1:
+                self.impact = True
+                if abs(self.velocity[1]) < 0.3:
                     self.velocity[1] = 0
                     self.grounded = True
 
@@ -49,6 +51,7 @@ class Physics_object:
             else:
                 self.hitbox.left = other_hitbox.right
         if len(hitlist):
+            self.impact = True
             self.velocity[0] = -self.velocity[0] * bounce
             self.velocity[1] = -self.velocity[1] * bounce
 

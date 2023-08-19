@@ -10,7 +10,7 @@ import vector_math
 import copy
 
 #constants
-RES_SCALE = 1.5
+RES_SCALE = 1
 SCREEN_SIZE = (960 * RES_SCALE, 540 * RES_SCALE)
 BLACK  = (0,0,0)
 WHITE = (255,255,255)
