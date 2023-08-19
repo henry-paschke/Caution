@@ -18,7 +18,8 @@ BLACK  = (0,0,0)
 WHITE = (255,255,255)
 
 g_running = True
-g_screen_surface = pg.display.set_mode(SCREEN_SIZE, pg.SCALED | pg.RESIZABLE)
+g_screen_surface = pg.surface.Surface(SCREEN_SIZE)
+g_window = pg.display.set_mode((960, 540), pg.SCALED | pg.RESIZABLE)
 g_clock = pg.time.Clock()
 g_debug_font = pg.font.Font(None, 20)
 
@@ -81,5 +82,6 @@ while g_running:
         player_body.velocity[0] = player_body.velocity[0] * 0.07 * d_t
     
     go.update(g_screen_surface, d_t, [player_body.hitbox.x - 80, player_body.hitbox.y -150])
+    g_window.blit(pg.transform.scale(g_screen_surface, g_window.get_size(), g_window), (0,0))
     pg.display.flip()
         
