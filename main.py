@@ -42,8 +42,6 @@ spike = pg.image.load("spike.png")
 while g_running:
     g_screen_surface.surface.fill(WHITE)
     d_t = g_clock.tick_busy_loop(120)
-
-    #player_body.draw(g_screen_surface)
     
     utility.stamp_text([str(g_clock.get_fps())], g_screen_surface, (20,20))
 
@@ -98,7 +96,10 @@ while g_running:
     
     go.update(g_screen_surface, d_t, [player_body.hitbox.x - 100, player_body.hitbox.y -150])
 
-    hitlist = player_body.hitbox.collidelistall(traps)
+    box = player_body.hitbox.copy()
+    box.x += box.width / 3
+    box.width = box.width / 3
+    hitlist = box.collidelistall(traps)
     if(len(hitlist) and go.go.invisible == False):
         go.go.gib(g_particles, [player_body.hitbox.x - 100, player_body.hitbox.y -150], player_body.velocity)
     
