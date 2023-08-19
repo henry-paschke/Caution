@@ -33,6 +33,11 @@ floors = [
     pg.rect.Rect(1500, 0, 500, 1000)
 ]
 
+traps = [
+    pg.rect.Rect(900, 900 - 64, 64,64)
+]
+spike = pg.image.load("spike.png")
+
 
 while g_running:
     g_screen_surface.surface.fill(WHITE)
@@ -41,6 +46,8 @@ while g_running:
     #player_body.draw(g_screen_surface)
     
     utility.stamp_text([str(g_clock.get_fps())], g_screen_surface, (20,20))
+
+    g_screen_surface.blit(spike, traps[0].topleft)
 
     player_body.update(d_t)
     player_body.collide_with_objects(floors, d_t)
@@ -90,10 +97,13 @@ while g_running:
         player_body.velocity[0] = player_body.velocity[0] * 0.07 * d_t
     
     go.update(g_screen_surface, d_t, [player_body.hitbox.x - 100, player_body.hitbox.y -150])
-    if(k[pg.K_0] and go.go.invisible == False):
+
+    hitlist = player_body.hitbox.collidelistall(traps)
+    if(len(hitlist) and go.go.invisible == False):
         go.go.gib(g_particles, [player_body.hitbox.x - 100, player_body.hitbox.y -150], player_body.velocity)
     
-    g_screen_surface.target([player_body.hitbox.x - 100, player_body.hitbox.y -150])
+    if ( not go.go.invisible):
+        g_screen_surface.target([player_body.hitbox.x - 100, player_body.hitbox.y -150])
 
     g_window.blit(pg.transform.scale(g_screen_surface.surface, g_window.get_size(), g_window), (0,0))
     pg.display.flip()
