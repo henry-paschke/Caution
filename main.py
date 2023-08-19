@@ -45,7 +45,7 @@ spike = pg.image.load("spike.png")
 
 while g_running:
     g_screen_surface.surface.fill(WHITE)
-    d_t = g_clock.tick_busy_loop()
+    d_t = g_clock.tick_busy_loop(120)
     
     utility.stamp_text([str(g_clock.get_fps())], g_screen_surface, (20,20))
 
@@ -85,7 +85,7 @@ while g_running:
        
     k = pg.key.get_pressed()       
     if (k[pg.K_d]):       
-        if player_body.grounded:       
+        if player_body.grounded and player_body.impact == False:       
             go.switch_animation("walk")       
             go.flip = False       
         if player_body.velocity[0] > 0:       
@@ -93,7 +93,7 @@ while g_running:
         else:       
             player_body.velocity[0] = .3       
     elif (k[pg.K_a]):       
-        if player_body.grounded:       
+        if player_body.grounded and player_body.impact == False:       
             go.switch_animation("walk")       
             go.flip = True
         if player_body.velocity[0] < 0:
