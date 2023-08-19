@@ -22,7 +22,7 @@ class Keyframe_animation:
             self.object.set_keyframe(self.keyframe_list[self.frame])
 
     def change_animation(self, id_number, serialized_data, interval):
-        self.keyframe_list[id_number] = game_object_editor.create_keyframe_from_serialized(serialized_data.copy(), interval)
+        self.keyframe_list[id_number] = game_object_editor.create_keyframe_from_serialized(serialized_data, interval)
     
     def add_frame(self, serialized_data, length):
         self.keyframe_list.append(game_object_editor.create_keyframe_from_serialized(serialized_data, length))
@@ -31,6 +31,12 @@ class Keyframe_animation:
         self.keyframe_list.clear()
         for i in range(len(keyframe_list)):
             self.keyframe_list.append(game_object_editor.create_keyframe_from_serialized(keyframe_list[i], intervals[i]))
+    
+    def switch_animation(self, animation_data):
+        self.keyframe_list = animation_data.keyframe_list
+        self.frame = 0
+        self.elapsed = 0
+        self.object.set_keyframe(self.keyframe_list[self.frame])
 
 
 def create_animation(fp, go):

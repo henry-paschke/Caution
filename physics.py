@@ -24,6 +24,7 @@ class Physics_object:
         
 
     def collide_with_objects(self, hitbox_list, d_time):
+        bounce = 0.7
         if self.grounded == False:
             self.hitbox.y += self.velocity[1] * d_time
 
@@ -34,7 +35,7 @@ class Physics_object:
                 else:
                     self.hitbox.top = other_hitbox.bottom
             if len(hitlist):
-                self.velocity[1] = -self.velocity[1] * 0.5
+                self.velocity[1] = -self.velocity[1] * bounce
                 if abs(self.velocity[1]) < 0.1:
                     self.velocity[1] = 0
                     self.grounded = True
@@ -48,8 +49,8 @@ class Physics_object:
             else:
                 self.hitbox.left = other_hitbox.right
         if len(hitlist):
-            self.velocity[0] = -self.velocity[0] * 0.5
-            self.velocity[1] = self.velocity[1] * 0.5
+            self.velocity[0] = -self.velocity[0] * bounce
+            self.velocity[1] = -self.velocity[1] * bounce
 
         
         #print(self.velocity)
