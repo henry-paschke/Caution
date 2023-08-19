@@ -154,3 +154,8 @@ class Game_object:
             particle_list.append(particle.Particle(self.img, vector_math.add_vector2(offset, self.global_position), self.global_rotation, 4, vel))
         for child in self.children:
             child.gib(particle_list, offset, vel)
+
+    def set_visible(self):
+        self.invisible = False
+        for c in self.children:
+            c.set_visible()

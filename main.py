@@ -17,7 +17,8 @@ WHITE = (255,255,255)
 
 g_running = True
 g_screen_surface = camera.Camera(SCREEN_SIZE)
-g_window = pg.display.set_mode((960, 540), pg.SCALED | pg.RESIZABLE)
+info_object = pg.display.Info()
+g_window = pg.display.set_mode((info_object.current_w, info_object.current_h), pg.SCALED | pg.RESIZABLE)
 g_clock = pg.time.Clock()
 g_debug_font = pg.font.Font(None, 20)
 g_particles = []
@@ -36,6 +37,7 @@ floors = [
 traps = [
     pg.rect.Rect(900, 900 - 64, 64,64)
 ]
+
 spike = pg.image.load("spike.png")
 
 
@@ -69,6 +71,9 @@ while g_running:
                 player_body.velocity[1] = -1
                 player_body.grounded = False
                 go.switch_animation("jump")
+            if e.key == pg.K_0:
+                player_body = physics.Physics_object(0,0,300,350, 4)
+                go.go.set_visible()
 
     if (player_body.impact and player_body.grounded == False):
         go.switch_animation("tumble")    
@@ -103,7 +108,7 @@ while g_running:
     if(len(hitlist) and go.go.invisible == False):
         go.go.gib(g_particles, [player_body.hitbox.x - 100, player_body.hitbox.y -150], player_body.velocity)
     
-    if ( not go.go.invisible):
+    if (not go.go.invisible):
         g_screen_surface.target([player_body.hitbox.x - 100, player_body.hitbox.y -150])
 
     g_window.blit(pg.transform.scale(g_screen_surface.surface, g_window.get_size(), g_window), (0,0))
