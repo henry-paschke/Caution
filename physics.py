@@ -52,7 +52,8 @@ class Physics_object:
             else:
                 self.hitbox.left = other_hitbox.right
         if len(hitlist):
-            self.impact = True
+            if self.grounded == False:
+                self.impact = True
             self.velocity[0] = -self.velocity[0] * bounce
             self.velocity[1] = -self.velocity[1] * bounce
 

@@ -27,13 +27,14 @@ g_particles = []
 
 g_assets = []
 
-go = animation_wrapper.Animation_wrapper("skeletons/human.ske", "tumble", g_assets, ["walk", "idle", "jump"])
+go = animation_wrapper.Animation_wrapper("skeletons/human.ske", "tumble", g_assets, ["walk", "idle", "jump", "rocket", "pound"])
 
 player_body = physics.Physics_object(0,0,300,350, 4)
 
 floors = [
-    pg.rect.Rect(0, 900, 2000, 500),
-    pg.rect.Rect(1500, 0, 500, 1000)
+    pg.rect.Rect(0, 900, 8000, 500),
+    pg.rect.Rect(1500, 0, 500, 1000),
+    pg.rect.Rect(3000, 250, 250, 1000)
 ]
 
 traps = [
@@ -78,8 +79,19 @@ while g_running:
                 go.switch_animation("jump")
             if e.key == pg.K_0:
                 player_body = physics.Physics_object(0,0,300,350, 4)       
-                go.go.set_visible()       
-       
+                go.go.set_visible()   
+            if e.key == pg.K_e and player_body.grounded == False:
+                if not go.flip:
+                    player_body.velocity[0] = 3
+                else :
+                    player_body.velocity[0] = -3
+                player_body.velocity[1] = -0.5
+                go.switch_animation("rocket")   
+            if e.key == pg.K_q and player_body.grounded == False:
+                player_body.velocity[1] = 2
+                go.switch_animation("pound")   
+
+        
     if (player_body.impact and player_body.grounded == False):       
         go.switch_animation("tumble")           
        
