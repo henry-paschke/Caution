@@ -25,11 +25,9 @@ class Animation_wrapper:
         surface.blit(pg.transform.flip(self.surf, self.flip, False), position)
 
     def switch_animation(self, name):
-        t = pg.time.get_ticks()
         if name != self.current:
             self.animation.switch_animation(self.animation_data[name])
             self.current = name
-        print(pg.time.get_ticks() - t)
 
 
 

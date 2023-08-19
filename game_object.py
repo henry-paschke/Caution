@@ -3,6 +3,7 @@ import math
 import vector_math
 from globals import *
 import utility
+import particle
 
 class Target:
     def __init__(self, position : list[float, float], rotation : float, time = -1):
@@ -54,6 +55,7 @@ class Game_object:
         self.elapsed = 0
         self.target_startpos = None
         self.img = img
+        self.invisible = False
 
     def add_child(self, game_object):
         self.children.append(game_object)
@@ -125,7 +127,7 @@ class Game_object:
             child.draw_recursive(surface)
     
     def draw(self, surface):
-        if (self.img):
+        if (self.img and self.invisible == False):
             rotatedimg = pg.transform.rotate(self.img, -vector_math.radians_to_degrees(self.global_rotation))
             surface.blit(rotatedimg, vector_math.add_vector2(self.global_position, (-rotatedimg.get_width() / 2, -rotatedimg.get_height() / 2)))
 
@@ -145,3 +147,10 @@ class Game_object:
     def get_current_as_target(self):
         self.normalize_rotation()
         return Target(self.local_position, self.local_rotation)           
+    
+    def gib(self, particle_list, offset, vel):
+        self.invisible = True
+        if self.img:
+            particle_list.append(particle.Particle(self.img, vector_math.add_vector2(offset, self.global_position), self.global_rotation, 4, vel))
+        for child in self.children:
+            child.gib(particle_list, offset, vel)

@@ -41,6 +41,7 @@ class Physics_object:
                 if abs(self.velocity[1]) < 0.3:
                     self.velocity[1] = 0
                     self.grounded = True
+                    self.impact = False
 
         self.hitbox.x += self.velocity[0] * d_time
 
