@@ -4,6 +4,7 @@ import vector_math
 from globals import *
 import utility
 import particle
+import random
 
 class Target:
     def __init__(self, position : list[float, float], rotation : float, time = -1):

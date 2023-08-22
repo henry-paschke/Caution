@@ -1,0 +1,27 @@
+﻿
+FONTLOG for Safety
+–––––––––––––––––––––––––––––––––––––––––
+This file provides detailed information on the Safety Font Software. 
+This information should be distributed along with the Safety fonts and any derivative works.
+
+
+Basic Font Information
+–––––––––––––––––––––––––––––––––––––––––
+Safety – A squarish technical looking font, best suited for labeling objects or warning signs, designed by Christoph Thürsam.
+
+
+ChangeLog
+–––––––––––––––––––––––––––––––––––––––––
+(This should list both major and minor changes, most recent first.)
+
+30 October 2012 (Christoph Thürsam) Safety Version 1.0
+- Initial release of the font Safety under the SIL OFL 1.1
+
+Acknowledgements
+–––––––––––––––––––––––––––––––––––––––––
+(Here is where contributors can be acknowledged. If you make modifications be sure to add your name (N), email (E), web-address (W) and description (D). This list is sorted by last name in alphabetical order.)
+
+N: <Copyright Holder>
+E: <email>
+W: <URL>
+D: Designer 

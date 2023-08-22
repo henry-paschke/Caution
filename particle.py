@@ -29,10 +29,13 @@ class Particle:
 BLOOD_RANDOM = 10
 
 class Blood:
-    def __init__(self, pos):
+    def __init__(self, pos, vel=None):
         self.pos = pos
         self.physics_body = physics.Physics_object(pos[0], pos[1], 4,4, 3)
-        self.physics_body.velocity = [(random.randint(0, BLOOD_RANDOM * 2) - BLOOD_RANDOM) / 4, (random.randint(0, BLOOD_RANDOM * 2) - BLOOD_RANDOM) / 4]
+        if vel == None:
+            self.physics_body.velocity = [(random.randint(0, BLOOD_RANDOM * 2) - BLOOD_RANDOM) / 4, (random.randint(0, BLOOD_RANDOM * 2) - BLOOD_RANDOM) / 4]
+        else:
+            self.physics_body.velocity = vector_math.add_vector2(vel , [(random.randint(0, BLOOD_RANDOM) - BLOOD_RANDOM/2) / 8, (random.randint(0, BLOOD_RANDOM) - BLOOD_RANDOM/2) / 8])
         self.dead = False
     
     def update(self, surface, hitboxes, d_t):

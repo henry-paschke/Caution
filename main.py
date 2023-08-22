@@ -6,6 +6,8 @@ import animation_wrapper
 import physics
 import camera
 import particle
+import vector_math
+import math
 
 
 #python -m cProfile -o main.prof main.py   
@@ -20,19 +22,30 @@ WHITE = (255,255,255)
 g_running = True
 g_screen_surface = camera.Camera(SCREEN_SIZE)
 info_object = pg.display.Info()
-g_window = pg.display.set_mode((info_object.current_w, info_object.current_h), pg.SCALED | pg.RESIZABLE)
+WINDOW_SIZE = (info_object.current_w, info_object.current_h)
+WINDOW_SIZE = ((info_object.current_w / 2, info_object.current_h / 2))
+g_window = pg.display.set_mode(WINDOW_SIZE, pg.SCALED | pg.RESIZABLE)
 g_clock = pg.time.Clock()
 g_debug_font = pg.font.Font(None, 20)
 g_particles = []
+g_speed = 1.0
+g_zoom = 1.0
+
+death_stamp = 0
+font = pg.font.Font("font/safety/SafetyMedium.otf")
+death_label = font.render("You died. Press f to restart.", (0,0,0, 255), (0,0,0,0))
+
 
 g_assets = []
 
 go = animation_wrapper.Animation_wrapper("skeletons/human.ske", "tumble", g_assets, ["walk", "idle", "jump", "rocket", "pound"])
 
-player_body = physics.Physics_object(0,0,300,350, 4)
+player_body = physics.Physics_object(0,0,150,350, 4)
+
+leak_spots = []
 
 floors = [
-    pg.rect.Rect(0, 900, 8000, 500),
+    pg.rect.Rect(0, 900, 100000, 500),
     pg.rect.Rect(1500, 0, 500, 1000),
     pg.rect.Rect(3000, 250, 250, 1000)
 ]
@@ -46,7 +59,7 @@ spike = pg.image.load("spike.png")
 
 while g_running:
     g_screen_surface.surface.fill(WHITE)
-    d_t = g_clock.tick_busy_loop(120)
+    d_t = g_clock.tick_busy_loop(120) / g_speed
     
     utility.stamp_text([str(g_clock.get_fps())], g_screen_surface, (20,20))
 
@@ -61,7 +74,6 @@ while g_running:
         g_particles[i].update(g_screen_surface, floors, d_t)
 
     particle.remove_dead_objects(g_particles)
-    print(len(g_particles))
 
     for e in pg.event.get():
         if e.type == pg.QUIT:
@@ -77,9 +89,13 @@ while g_running:
                 player_body.velocity[1] = -1
                 player_body.grounded = False
                 go.switch_animation("jump")
-            if e.key == pg.K_0:
-                player_body = physics.Physics_object(0,0,300,350, 4)       
+            if e.key == pg.K_f:
+                player_body = physics.Physics_object(0,0,150,350,4)     
                 go.go.set_visible()   
+                g_speed = 1
+                g_zoom = 1
+                death_stamp = 0
+                leak_spots.clear()
             if e.key == pg.K_e and player_body.grounded == False:
                 if not go.flip:
                     player_body.velocity[0] = 3
@@ -89,23 +105,25 @@ while g_running:
                 go.switch_animation("rocket")   
             if e.key == pg.K_q and player_body.grounded == False:
                 player_body.velocity[1] = 2
-                go.switch_animation("pound")   
-
+                go.switch_animation("pound")  
+            if e.key == pg.K_9:
+                go.get_child("Left_arm_top").gib(g_particles, [player_body.hitbox.x - 200, player_body.hitbox.y -150], player_body.velocity)
+                leak_spots.append("Left_arm_top")
         
     if (player_body.impact and player_body.grounded == False):       
         go.switch_animation("tumble")           
        
     k = pg.key.get_pressed()       
-    if (k[pg.K_d]):       
-        if player_body.grounded and player_body.impact == False:       
+    if (k[pg.K_d] and player_body.impact == False):       
+        if player_body.grounded:       
             go.switch_animation("walk")       
             go.flip = False       
         if player_body.velocity[0] > 0:       
             player_body.velocity[0] = player_body.velocity[0] + 0.0007 * d_t       
         else:       
             player_body.velocity[0] = .3       
-    elif (k[pg.K_a]):       
-        if player_body.grounded and player_body.impact == False:       
+    elif (k[pg.K_a] and player_body.impact == False):       
+        if player_body.grounded:       
             go.switch_animation("walk")       
             go.flip = True
         if player_body.velocity[0] < 0:
@@ -114,20 +132,44 @@ while g_running:
             player_body.velocity[0] = -.3
     elif player_body.grounded:
         go.switch_animation("idle")
+        print(player_body.velocity[0])
         player_body.velocity[0] = player_body.velocity[0] * 0.07 * d_t
+        if abs(player_body.velocity[0]) < 0.0001:
+            player_body.velocity[0] = 0
+        print(player_body.velocity[0])
     
-    go.update(g_screen_surface, d_t, [player_body.hitbox.x - 100, player_body.hitbox.y -150])
+    #g_screen_surface.draw_rect(player_body.hitbox, (255,0,0))
+    go.update(g_screen_surface, d_t, player_body.hitbox, (player_body.impact or not player_body.grounded))
 
     box = player_body.hitbox.copy()
     box.x += box.width / 3
     box.width = box.width / 3
     hitlist = box.collidelistall(traps)
     if(len(hitlist) and go.go.invisible == False):
-        go.go.gib(g_particles, [player_body.hitbox.x - 100, player_body.hitbox.y -150], player_body.velocity)
+        go.go.gib(g_particles, [player_body.hitbox.x - 200, player_body.hitbox.y -150], player_body.velocity)
     
     if (not go.go.invisible):
-        g_screen_surface.target([player_body.hitbox.x - 100, player_body.hitbox.y -150])
+        g_screen_surface.target(player_body.hitbox.center)
+    else:
+        death_stamp += d_t
+        g_zoom = vector_math.lerp(1.0, 1.001, death_stamp, 10.0)
+        g_speed = vector_math.lerp(1.0, 1.05, death_stamp, 100.0)
 
-    g_window.blit(pg.transform.scale(g_screen_surface.surface, g_window.get_size(), g_window), (0,0))
+    newsurf = pg.transform.scale(g_screen_surface.surface, [g_window.get_size()[0] * g_zoom, g_window.get_size()[1]* g_zoom])
+    g_window.blit(newsurf, (0,0))
+
+    if (go.go.invisible):
+        g_window.blit(death_label, (200,200))
+
+    if not go.go.invisible:
+        for spot in leak_spots:
+            pos = go.get_child_pos(spot, player_body.hitbox)
+            rot = go.get_child(spot).global_rotation
+            sign = 1
+            if go.flip:
+                sign = -1
+            vel = [math.cos(rot) * sign, math.sin(rot)]
+            g_particles.append(particle.Blood(pos, vel))
+
     pg.display.flip()
         

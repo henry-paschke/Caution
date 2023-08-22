@@ -14,6 +14,7 @@ class Camera:
         pg.draw.rect(self.surface, color, (rect.x - self.position[0], rect.y - self.position[1], rect.width, rect.height))
     
     def target(self, pos):
-        x = vector_math.lerp(self.position[0], pos[0] - self.size[0] / 3, .06, 1)
-        y = vector_math.lerp(self.position[1], pos[1] - self.size[1] / 3, .06, 1)
+        speed = .5
+        x = vector_math.lerp(self.position[0], pos[0] - self.size[0] / 3, speed, 1)
+        y = vector_math.lerp(self.position[1], pos[1] - self.size[1] / 3, speed, 1)
         self.position = [x , y]
