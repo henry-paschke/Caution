@@ -23,7 +23,7 @@ g_running = True
 g_screen_surface = camera.Camera(SCREEN_SIZE)
 info_object = pg.display.Info()
 WINDOW_SIZE = (info_object.current_w, info_object.current_h)
-WINDOW_SIZE = ((info_object.current_w / 2, info_object.current_h / 2))
+#WINDOW_SIZE = ((info_object.current_w / 2, info_object.current_h / 2))
 g_window = pg.display.set_mode(WINDOW_SIZE, pg.SCALED | pg.RESIZABLE)
 g_clock = pg.time.Clock()
 g_debug_font = pg.font.Font(None, 20)
@@ -59,7 +59,7 @@ spike = pg.image.load("spike.png")
 
 while g_running:
     g_screen_surface.surface.fill(WHITE)
-    d_t = g_clock.tick_busy_loop(120) / g_speed
+    d_t = g_clock.tick_busy_loop(300) / g_speed
     
     utility.stamp_text([str(g_clock.get_fps())], g_screen_surface, (20,20))
 
@@ -98,17 +98,17 @@ while g_running:
                 leak_spots.clear()
             if e.key == pg.K_e and player_body.grounded == False:
                 if not go.flip:
-                    player_body.velocity[0] = 3
+                    player_body.velocity[0] = 1.5
                 else :
-                    player_body.velocity[0] = -3
+                    player_body.velocity[0] = -1.5
                 player_body.velocity[1] = -0.5
                 go.switch_animation("rocket")   
             if e.key == pg.K_q and player_body.grounded == False:
                 player_body.velocity[1] = 2
                 go.switch_animation("pound")  
             if e.key == pg.K_9:
-                go.get_child("Left_arm_top").gib(g_particles, [player_body.hitbox.x - 200, player_body.hitbox.y -150], player_body.velocity)
-                leak_spots.append("Left_arm_top")
+                go.get_child("Head").gib(g_particles, [player_body.hitbox.x - 200, player_body.hitbox.y -150], player_body.velocity)
+                leak_spots.append("Head")
         
     if (player_body.impact and player_body.grounded == False):       
         go.switch_animation("tumble")           
@@ -137,6 +137,8 @@ while g_running:
         if abs(player_body.velocity[0]) < 0.0001:
             player_body.velocity[0] = 0
         print(player_body.velocity[0])
+    if abs(player_body.velocity[0]) > 1 and player_body.grounded:
+            player_body.velocity[0] = 0
     
     #g_screen_surface.draw_rect(player_body.hitbox, (255,0,0))
     go.update(g_screen_surface, d_t, player_body.hitbox, (player_body.impact or not player_body.grounded))
@@ -168,6 +170,8 @@ while g_running:
             sign = 1
             if go.flip:
                 sign = -1
+                dif = 2 * (player_body.hitbox.centerx - pos[0])
+                pos[0] += dif
             vel = [math.cos(rot) * sign, math.sin(rot)]
             g_particles.append(particle.Blood(pos, vel))
 
