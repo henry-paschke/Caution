@@ -18,13 +18,15 @@ RES_SCALE = 2
 SCREEN_SIZE = (960 * RES_SCALE, 540 * RES_SCALE)
 BLACK  = (0,0,0)
 WHITE = (255,255,255)
+SCREEN_LABEL = "CAUTION"
 
 g_running = True
 g_screen_surface = camera.Camera(SCREEN_SIZE)
 info_object = pg.display.Info()
-WINDOW_SIZE = (info_object.current_w, info_object.current_h)
-#WINDOW_SIZE = ((info_object.current_w / 2, info_object.current_h / 2))
+#WINDOW_SIZE = (info_object.current_w, info_object.current_h)
+WINDOW_SIZE = ((info_object.current_w / 2, info_object.current_h / 2))
 g_window = pg.display.set_mode(WINDOW_SIZE, pg.SCALED | pg.RESIZABLE)
+pg.display.set_caption(SCREEN_LABEL)
 g_clock = pg.time.Clock()
 g_debug_font = pg.font.Font(None, 20)
 g_particles = []
@@ -109,6 +111,8 @@ while g_running:
             if e.key == pg.K_9:
                 go.get_child("Head").gib(g_particles, [player_body.hitbox.x - 200, player_body.hitbox.y -150], player_body.velocity)
                 leak_spots.append("Head")
+                go.get_child("Left_arm_bottom").gib(g_particles, [player_body.hitbox.x - 200, player_body.hitbox.y -150], player_body.velocity)
+                leak_spots.append("Left_arm_bottom")
         
     if (player_body.impact and player_body.grounded == False):       
         go.switch_animation("tumble")           
