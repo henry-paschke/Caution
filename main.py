@@ -136,11 +136,9 @@ while g_running:
             player_body.velocity[0] = -.3
     elif player_body.grounded:
         go.switch_animation("idle")
-        print(player_body.velocity[0])
         player_body.velocity[0] = player_body.velocity[0] * 0.07 * d_t
         if abs(player_body.velocity[0]) < 0.0001:
             player_body.velocity[0] = 0
-        print(player_body.velocity[0])
     if abs(player_body.velocity[0]) > 1 and player_body.grounded:
             player_body.velocity[0] = 0
     
